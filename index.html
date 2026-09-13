@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS — Digital Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============ RESET & BASE ============ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B5CF6;
+            --primary-light: #A78BFA;
+            --primary-dark: #7C3AED;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --accent: #C084FC;
+            --bg-dark: #030108;
+            --bg-card: rgba(15, 10, 30, 0.7);
+            --bg-card-hover: rgba(25, 15, 50, 0.8);
+            --text: #E2E8F0;
+            --text-muted: #94A3B8;
+            --text-bright: #F8FAFC;
+            --border: rgba(139, 92, 246, 0.15);
+            --border-hover: rgba(139, 92, 246, 0.4);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ============ ANIMATED SPACE BACKGROUND ============ */
+        #space-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .stars-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Nebula gradients */
+        .nebula {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .nebula-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: -10%;
+            right: -5%;
+            animation: nebula-drift 20s ease-in-out infinite;
+        }
+
+        .nebula-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #6D28D9 0%, transparent 70%);
+            bottom: -10%;
+            left: -5%;
+            animation: nebula-drift 25s ease-in-out infinite reverse;
+        }
+
+        .nebula-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: nebula-pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes nebula-drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -20px) scale(1.1); }
+            50% { transform: translate(-20px, 30px) scale(0.9); }
+            75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+
+        @keyframes nebula-pulse {
+            0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.2; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* ============ CURSOR GLOW ============ */
+        .cursor-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+        }
+
+        /* ============ MAIN CONTENT WRAPPER ============ */
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============ HEADER / NAVBAR ============ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 40px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(3, 1, 8, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            height: 60px;
+            background: rgba(3, 1, 8, 0.95);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-bright), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+            border-radius: 1px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-bright);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-discord {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: #5865F2;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-discord::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-discord:hover::before {
+            left: 100%;
+        }
+
+        .btn-discord:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(88, 101, 242, 0.4);
+        }
+
+        .btn-discord svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ============ HERO SECTION ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            font-weight: 500;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease 0.1s both;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--text-bright) 0%, var(--primary-light) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: gradient-shift 4s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: transparent;
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Hero scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+            animation: scroll-anim 2s ease-in-out infinite;
+        }
+
+        @keyframes scroll-anim {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ============ STATS BAR ============ */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            padding: 40px 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ============ SECTION STYLES ============ */
+        .section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ============ PRODUCTS GRID ============ */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 24px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .product-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+            background: var(--bg-card-hover);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-visual {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-visual::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to top, var(--bg-card), transparent);
+        }
+
+        .card-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .card-icon-wrapper {
+            transform: scale(1.1);
+        }
+
+        .card-icon-wrapper.rust-nfa {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .card-icon-wrapper.spoof {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .card-icon-wrapper.cs-prime {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .card-icon-wrapper.rust-cheat {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .card-icon-wrapper svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .card-bg-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: radial-gradient(circle at 20% 50%, var(--primary) 1px, transparent 1px),
+                              radial-gradient(circle at 80% 20%, var(--primary) 1px, transparent 1px),
+                              radial-gradient(circle at 60% 80%, var(--primary) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .card-content {
+            padding: 24px 28px 28px;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .card-tag.account {
+            background: rgba(239, 68, 68, 0.15);
+            color: #FCA5A5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .card-tag.software {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93C5FD;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .card-tag.prime-tag {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FCD34D;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .card-tag.cheat-tag {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6EE7B7;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .card-features li svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary-light);
+            flex-shrink: 0;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+
+        .card-price .currency {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .btn-buy {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-buy::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-buy:hover::before {
+            left: 100%;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        /* ============ FEATURES SECTION ============ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-light);
+        }
+
+        .feature-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ============ FAQ SECTION ============ */
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .faq-item.active {
+            border-color: var(--border-hover);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px 24px;
+            background: none;
+            border: none;
+            color: var(--text-bright);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--primary-light);
+        }
+
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(139, 92, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.active .faq-icon {
+            background: var(--primary);
+            transform: rotate(45deg);
+        }
+
+        .faq-icon svg {
+            width: 14px;
+            height: 14px;
+            color: var(--primary-light);
+        }
+
+        .faq-item.active .faq-icon svg {
+            color: white;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .faq-answer-content {
+            padding: 0 24px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+        }
+
+        /* ============ CTA SECTION ============ */
+        .cta-section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .cta-box {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .cta-glow {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 200px;
+            background: radial-gradient(ellipse, var(--primary-glow), transparent 70%);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .cta-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cta-desc {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-bright), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: linear-gradient(180deg, rgba(20, 10, 40, 0.98), rgba(10, 5, 25, 0.98));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #FCA5A5;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 8px;
+        }
+
+        .modal-product-name {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .modal-info {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .modal-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .modal-info-row:not(:last-child) {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-info-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .modal-info-value {
+            color: var(--text-bright);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .modal-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .modal-total-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .modal-total-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .btn-purchase {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-purchase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-purchase:hover::before {
+            left: 100%;
+        }
+
+        .btn-purchase:hover {
+            box-shadow: 0 10px 40px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .modal-note {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        /* ============ LOGIN NOTIFICATION ============ */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(15, 10, 30, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(calc(100% + 40px));
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .notification.error {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification.success .notification-icon {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6EE7B7;
+        }
+
+        .notification.error .notification-icon {
+            background: rgba(239, 68, 68, 0.15);
+            color: #FCA5A5;
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ============ MOBILE MENU ============ */
+        .mobile-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .mobile-toggle span {
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============ USER PROFILE (after login) ============ */
+        .user-profile {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px 6px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            border-color: var(--border-hover);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ============ PARTICLES ============ */
+        .particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        /* ============ ANIMATIONS ============ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(3, 1, 8, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 20px;
+                gap: 16px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .nav-auth .btn-discord span {
+                display: none;
+            }
+
+            .stats-bar {
+                gap: 30px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .hero-title {
+                font-size: clamp(2.2rem, 8vw, 3.5rem);
+            }
+
+            .modal {
+                padding: 28px;
+            }
+
+            .cta-box {
+                padding: 40px 24px;
+            }
+
+            .user-name {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn-primary, .btn-secondary {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cursor Glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- Space Background -->
+<div id="space-bg">
+    <canvas id="starsCanvas"></canvas>
+</div>
+
+<!-- Nebula Effects -->
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <div class="notification-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+    <span class="notification-text" id="notificationText">Успешно!</span>
+</div>
+
+<!-- Content -->
+<div class="content-wrapper">
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="url(#logoGrad)" stroke-width="2" opacity="0.5"/>
+                    <circle cx="20" cy="20" r="8" fill="url(#logoGrad)"/>
+                    <circle cx="20" cy="20" r="12" stroke="url(#logoGrad)" stroke-width="1.5" stroke-dasharray="4 4">
+                        <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="20s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="20" cy="8" r="2.5" fill="#A78BFA">
+                        <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="8s" repeatCount="indefinite"/>
+                    </circle>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8B5CF6"/>
+                            <stop offset="100%" stop-color="#C084FC"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="logo-text">NEXUS</span>
+        </a>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#products">Товары</a></li>
+            <li><a href="#features">Преимущества</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+
+        <div class="nav-auth">
+            <div class="user-profile" id="userProfile">
+                <div class="user-avatar" id="userAvatar">N</div>
+                <span class="user-name" id="userName">User</span>
+            </div>
+            <button class="btn-discord" id="loginBtn" onclick="loginWithDiscord()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                <span>Войти через Discord</span>
+            </button>
+            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobile()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <div class="badge-dot"></div>
+            Все системы активны
+        </div>
+        <h1 class="hero-title">
+            <span class="gradient-text">NEXUS</span>
+        </h1>
+        <p class="hero-subtitle">
+            Цифровой маркетплейс нового поколения. Аккаунты, споферы и программное обеспечение с мгновенной доставкой.
+        </p>
+        <div class="hero-buttons">
+            <a href="#products" class="btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                Каталог
+            </a>
+            <a href="#features" class="btn-secondary">
+                Узнать больше
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item animate-on-scroll">
+            <div class="stat-number" data-count="1247">0</div>
+            <div class="stat-label">Продаж</div>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <div class="stat-number" data-count="843">0</div>
+            <div class="stat-label">Клиентов</div>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <div class="stat-number">99%</div>
+            <div class="stat-label">Отзывов 5★</div>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Поддержка</div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <section class="section" id="products">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">// Каталог</span>
+            <h2 class="section-title">Наши товары</h2>
+            <p class="section-desc">Выберите то, что вам нужно. Мгновенная доставка после оплаты.</p>
+        </div>
+
+        <div class="products-grid">
+            <!-- Card 1: Rust NFA -->
+            <div class="product-card animate-on-scroll" onclick="openModal('rust-nfa')">
+                <div class="card-visual">
+                    <div class="card-bg-pattern"></div>
+                    <div class="card-icon-wrapper rust-nfa">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag account">Аккаунт</span>
+                    <h3 class="card-title">Rust NFA</h3>
+                    <p class="card-desc">Аккаунт Rust с полным доступом. NFA — без полного доступа к почте.</p>
+                    <ul class="card-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Мгновенная выдача
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Гарантия 24 часа
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Лицензия Steam
+                        </li>
+                    </ul>
+                    <div class="card-footer">
+                        <div class="card-price">149 <span class="currency">₽</span></div>
+                        <button class="btn-buy">
+                            Купить
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Spoof -->
+            <div class="product-card animate-on-scroll" onclick="openModal('spoof')">
+                <div class="card-visual">
+                    <div class="card-bg-pattern"></div>
+                    <div class="card-icon-wrapper spoof">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#93C5FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag software">Софт</span>
+                    <h3 class="card-title">Spoofer</h3>
+                    <p class="card-desc">Продвинутый спуфер для смены HWID. Обход античитов последнего поколения.</p>
+                    <ul class="card-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Обход EAC / BE
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Подробная инструкция
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Обновления включены
+                        </li>
+                    </ul>
+                    <div class="card-footer">
+                        <div class="card-price">299 <span class="currency">₽</span></div>
+                        <button class="btn-buy">
+                            Купить
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: CS Prime -->
+            <div class="product-card animate-on-scroll" onclick="openModal('cs-prime')">
+                <div class="card-visual">
+                    <div class="card-bg-pattern"></div>
+                    <div class="card-icon-wrapper cs-prime">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag prime-tag">Прайм</span>
+                    <h3 class="card-title">CS2 Prime</h3>
+                    <p class="card-desc">Аккаунт CS2 с активным Prime статусом. Готов к конкурентной игре.</p>
+                    <ul class="card-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Prime статус активен
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Без VAC банов
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Гарантия замены
+                        </li>
+                    </ul>
+                    <div class="card-footer">
+                        <div class="card-price">199 <span class="currency">₽</span></div>
+                        <button class="btn-buy">
+                            Купить
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Rust Cheat -->
+            <div class="product-card animate-on-scroll" onclick="openModal('rust-cheat')">
+                <div class="card-visual">
+                    <div class="card-bg-pattern"></div>
+                    <div class="card-icon-wrapper rust-cheat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#6EE7B7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag cheat-tag">Чит</span>
+                    <h3 class="card-title">Rust Cheat</h3>
+                    <p class="card-desc">Приватный чит для Rust. ESP, Aimbot, и многое другое. Необнаруживаемый.</p>
+                    <ul class="card-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            ESP / Aimbot / Misc
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Undetected статус
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Подписка на 30 дней
+                        </li>
+                    </ul>
+                    <div class="card-footer">
+                        <div class="card-price">499 <span class="currency">₽</span></div>
+                        <button class="btn-buy">
+                            Купить
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">// Почему мы</span>
+            <h2 class="section-title">Преимущества</h2>
+            <p class="section-desc">Мы создали лучший опыт покупки цифровых товаров.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Мгновенная доставка</h3>
+                <p class="feature-desc">Получите товар автоматически сразу после оплаты. Без ожидания.</p>
+            </div>
+
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Гарантия качества</h3>
+                <p class="feature-desc">На все товары действует гарантия. Замена в случае проблем.</p>
+            </div>
+
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Поддержка 24/7</h3>
+                <p class="feature-desc">Наша команда поддержки всегда на связи в Discord.</p>
+            </div>
+
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                        <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Удобная оплата</h3>
+                <p class="feature-desc">Множество способов оплаты: карта, крипта, электронные кошельки.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">// Вопросы</span>
+            <h2 class="section-title">FAQ</h2>
+            <p class="section-desc">Ответы на часто задаваемые вопросы.</p>
+        </div>
+
+        <div class="faq-list">
+            <div class="faq-item animate-on-scroll">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Как происходит выдача товара?
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        После оплаты товар выдается автоматически. Данные аккаунта или ссылка на скачивание будут отправлены вам в Discord и отображены на сайте.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item animate-on-scroll">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Что делать если аккаунт не работает?
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Свяжитесь с нашей поддержкой в Discord. В рамках гарантии мы произведём замену аккаунта бесплатно.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item animate-on-scroll">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Какие способы оплаты доступны?
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Мы принимаем банковские карты (Visa, MasterCard, МИР), криптовалюту, а также электронные кошельки (ЮМани, QIWI и др.).
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item animate-on-scroll">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Безопасно ли пользоваться вашими товарами?
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Все наши продукты проходят проверку. Споферы и читы регулярно обновляются для поддержания статуса «Undetected».
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-box animate-on-scroll">
+            <div class="cta-glow"></div>
+            <h2 class="cta-title">Готовы начать?</h2>
+            <p class="cta-desc">Войдите через Discord и получите доступ ко всем товарам.</p>
+            <button class="btn-primary" onclick="loginWithDiscord()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Войти через Discord
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">NEXUS</div>
+            <ul class="footer-links">
+                <li><a href="#products">Товары</a></li>
+                <li><a href="#features">Преимущества</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#">Discord</a></li>
+            </ul>
+            <p class="footer-copy">© 2025 Nexus. Все права защищены.</p>
+        </div>
+    </footer>
+</div>
+
+<!-- Purchase Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModalDirect()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <h3 class="modal-title">Оформление заказа</h3>
+        <p class="modal-product-name" id="modalProductName"></p>
+
+        <div class="modal-info">
+            <div class="modal-info-row">
+                <span class="modal-info-label">Товар</span>
+                <span class="modal-info-value" id="modalItemName"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="modal-info-label">Категория</span>
+                <span class="modal-info-value" id="modalItemCategory"></span>
+            </div>
+            <div class="modal-info-row">
+                <span class="modal-info-label">Доставка</span>
+                <span class="modal-info-value" style="color: #6EE7B7;">Мгновенно</span>
+            </div>
+        </div>
+
+        <div class="modal-total">
+            <span class="modal-total-label">Итого:</span>
+            <span class="modal-total-price" id="modalPrice"></span>
+        </div>
+
+        <button class="btn-purchase" onclick="purchase()">
+            Перейти к оплате
+        </button>
+        <p class="modal-note">🔒 Безопасная оплата. Данные защищены.</p>
+    </div>
+</div>
+
+
+<script>
+    // ============ PRODUCTS DATA ============
+    const products = {
+        'rust-nfa': {
+            name: 'Rust NFA',
+            category: 'Аккаунт',
+            price: '149 ₽',
+            description: 'Аккаунт Rust (No Full Access)'
+        },
+        'spoof': {
+            name: 'Spoofer',
+            category: 'Софт',
+            price: '299 ₽',
+            description: 'HWID Spoofer для обхода банов'
+        },
+        'cs-prime': {
+            name: 'CS2 Prime',
+            category: 'Аккаунт Prime',
+            price: '199 ₽',
+            description: 'Аккаунт CS2 с Prime статусом'
+        },
+        'rust-cheat': {
+            name: 'Rust Cheat',
+            category: 'Чит',
+            price: '499 ₽',
+            description: 'Приватный чит для Rust (30 дней)'
+        }
+    };
+
+    // ============ STARS CANVAS ============
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function createStars() {
+        stars = [];
+        const count = Math.floor((canvas.width * canvas.height) / 4000);
+        for (let i = 0; i < count; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 1.5 + 0.5,
+                opacity: Math.random() * 0.8 + 0.2,
+                speed: Math.random() * 0.02 + 0.005,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+    }
+
+    function createShootingStar() {
+        if (Math.random() > 0.995 && shootingStars.length < 3) {
+            shootingStars.push({
+                x: Math.random() * canvas.width,
+                y: 0,
+                length: Math.random() * 80 + 40,
+                speed: Math.random() * 6 + 4,
+                angle: Math.PI / 4 + (Math.random() - 0.5) * 0.5,
+                opacity: 1,
+                decay: 0.015 + Math.random() * 0.01
+            });
+        }
+    }
+
+    function animateStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const time = Date.now() * 0.001;
+
+        // Draw stars
+        stars.forEach(star => {
+            const twinkle = Math.sin(time * star.speed * 50 + star.phase) * 0.3 + 0.7;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(200, 180, 255, ${star.opacity * twinkle})`;
+            ctx.fill();
+        });
+
+        // Draw shooting stars
+        createShootingStar();
+        shootingStars = shootingStars.filter(ss => {
+            ss.x += Math.cos(ss.angle) * ss.speed;
+            ss.y += Math.sin(ss.angle) * ss.speed;
+            ss.opacity -= ss.decay;
+
+            if (ss.opacity <= 0) return false;
+
+            const gradient = ctx.createLinearGradient(
+                ss.x, ss.y,
+                ss.x - Math.cos(ss.angle) * ss.length,
+                ss.y - Math.sin(ss.angle) * ss.length
+            );
+            gradient.addColorStop(0, `rgba(200, 180, 255, ${ss.opacity})`);
+            gradient.addColorStop(1, 'rgba(200, 180, 255, 0)');
+
+            ctx.beginPath();
+            ctx.moveTo(ss.x, ss.y);
+            ctx.lineTo(
+                ss.x - Math.cos(ss.angle) * ss.length,
+                ss.y - Math.sin(ss.angle) * ss.length
+            );
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            return true;
+        });
+
+        requestAnimationFrame(animateStars);
+    }
+
+    resizeCanvas();
+    createStars();
+    animateStars();
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        createStars();
+    });
+
+    // ============ CURSOR GLOW ============
+    const cursorGlow = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', (e) => {
+        cursorGlow.style.left = e.clientX + 'px';
+        cursorGlow.style.top = e.clientY + 'px';
+    });
+
+    // ============ NAVBAR SCROLL ============
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // ============ MOBILE MENU ============
+    function toggleMobile() {
+        const toggle = document.getElementById('mobileToggle');
+        const links = document.getElementById('navLinks');
+        toggle.classList.toggle('active');
+        links.classList.toggle('active');
+    }
+
+    // ============ SCROLL ANIMATIONS ============
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // ============ COUNTER ANIMATION ============
+    function animateCounters() {
+        const counters = document.querySelectorAll('[data-count]');
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const duration = 2000;
+            const start = Date.now();
+
+            function update() {
+                const elapsed = Date.now() - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                counter.textContent = Math.floor(target * eased).toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    counter.textContent = target.toLocaleString() + '+';
+                }
+            }
+            update();
+        });
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounters();
+                statsObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stats-bar').forEach(el => statsObserver.observe(el));
+
+    // ============ FAQ TOGGLE ============
+    function toggleFaq(btn) {
+        const item = btn.parentElement;
+        const isActive = item.classList.contains('active');
+
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+        if (!isActive) {
+            item.classList.add('active');
+        }
+    }
+
+    // ============ MODAL ============
+    function openModal(productId) {
+        const product = products[productId];
+        if (!product) return;
+
+        // Check if logged in
+        const isLoggedIn = localStorage.getItem('nexus_user');
+        if (!isLoggedIn) {
+            showNotification('Сначала войдите через Discord!', 'error');
+            return;
+        }
+
+        document.getElementById('modalProductName').textContent = product.description;
+        document.getElementById('modalItemName').textContent = product.name;
+        document.getElementById('modalItemCategory').textContent = product.category;
+        document.getElementById('modalPrice').textContent = product.price;
+
+        const overlay = document.getElementById('modalOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+        if (e.target === e.currentTarget) {
+            closeModalDirect();
+        }
+    }
+
+    function closeModalDirect() {
+        const overlay = document.getElementById('modalOverlay');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModalDirect();
+    });
+
+    function purchase() {
+        showNotification('Перенаправление на оплату...', 'success');
+        setTimeout(() => {
+            closeModalDirect();
+        }, 1500);
+    }
+
+    // ============ DISCORD LOGIN (Simulated) ============
+    function loginWithDiscord() {
+        const isLoggedIn = localStorage.getItem('nexus_user');
+
+        if (isLoggedIn) {
+            // Logout
+            localStorage.removeItem('nexus_user');
+            document.getElementById('loginBtn').style.display = 'flex';
+            document.getElementById('userProfile').style.display = 'none';
+            showNotification('Вы вышли из аккаунта', 'success');
+            return;
+        }
+
+        // Simulate Discord OAuth
+        // In production, redirect to: https://discord.com/api/oauth2/authorize?client_id=YOUR_ID&redirect_uri=YOUR_URI&response_type=code&scope=identify
+        const mockUser = {
+            name: 'NexusUser',
+            avatar: 'N'
+        };
+
+        // Simulate login delay
+        document.getElementById('loginBtn').innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            <span>Подключение...</span>
+        `;
+
+        setTimeout(() => {
+            localStorage.setItem('nexus_user', JSON.stringify(mockUser));
+
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userProfile').style.display = 'flex';
+            document.getElementById('userName').textContent = mockUser.name;
+            document.getElementById('userAvatar').textContent = mockUser.name[0];
+
+            showNotification(`Добро пожаловать, ${mockUser.name}!`, 'success');
+        }, 1500);
+    }
+
+    // Check login state on load
+    function checkLoginState() {
+        const user = localStorage.getItem('nexus_user');
+        if (user) {
+            const userData = JSON.parse(user);
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userProfile').style.display = 'flex';
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name[0];
+        }
+    }
+    checkLoginState();
+
+    // User profile click => logout
+    document.getElementById('userProfile').addEventListener('click', () => {
+        loginWithDiscord(); // toggles logout
+    });
+
+    // ============ NOTIFICATIONS ============
+    function showNotification(text, type = 'success') {
+        const notif = document.getElementById('notification');
+        const notifText = document.getElementById('notificationText');
+
+        notif.className = 'notification ' + type;
+        notifText.textContent = text;
+
+        // Update icon
+        const iconSvg = type === 'success'
+            ? '<polyline points="20 6 9 17 4 12"></polyline>'
+            : '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+
+        notif.querySelector('.notification-icon svg').innerHTML = iconSvg;
+
+        setTimeout(() => notif.classList.add('show'), 10);
+
+        setTimeout(() => {
+            notif.classList.remove('show');
+        }, 3000);
+    }
+
+    // ============ SMOOTH SCROLL for nav links ============
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Close mobile menu
+                document.getElementById('navLinks').classList.remove('active');
+                document.getElementById('mobileToggle').classList.remove('active');
+            }
+        });
+    });
+
+    // ============ ADD spin animation for loading ============
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+    `;
+    document.head.appendChild(style);
+
+</script>
+
+</body>
+</html>
